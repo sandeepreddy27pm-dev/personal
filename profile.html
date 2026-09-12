@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Sandeep Kumar P — Product Owner specializing in AI-driven products, product strategy and Agile delivery.">
+<title>Sandeep Kumar P | Product Owner • AI</title>
+<style>
+:root{
+  --bg:#f7f9fc;--surface:#fff;--ink:#17202a;--muted:#66727f;--line:#e2e8ef;
+  --blue:#0067c5;--blue2:#eaf4ff;--nav:#fff;--dark:#111820;
+  --shadow:0 18px 50px rgba(21,38,58,.08);--radius:22px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Inter,-apple-system,BlinkMacSystemFont,Roboto,Arial,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.container{width:min(1160px,calc(100% - 48px));margin:auto}
+.nav{position:sticky;top:0;z-index:100;height:68px;background:rgba(255,255,255,.9);backdrop-filter:blur(18px);border-bottom:1px solid rgba(20,35,50,.08)}
+.nav-inner{height:100%;display:flex;align-items:center;justify-content:space-between}
+.brand{font-weight:700;letter-spacing:-.02em}
+.brand small{font-weight:500;color:var(--muted);margin-left:7px}
+.navlinks{display:flex;gap:25px;font-size:14px;color:#485461}
+.navlinks a:hover{color:var(--blue)}
+.hero{background:#fff;border-bottom:1px solid var(--line);overflow:hidden}
+.hero-inner{min-height:700px;display:grid;grid-template-columns:1.25fr .75fr;gap:70px;align-items:center;padding:100px 0}
+.kicker{display:inline-flex;align-items:center;gap:8px;color:var(--blue);font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:20px}
+.kicker:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--blue)}
+h1{font-size:clamp(55px,7.4vw,92px);line-height:.94;letter-spacing:-.065em;margin:0 0 30px;font-weight:700}
+.lead{font-size:clamp(20px,2.2vw,27px);line-height:1.3;color:#3d4853;max-width:790px;letter-spacing:-.025em}
+.actions{display:flex;gap:11px;flex-wrap:wrap;margin-top:32px}
+.btn{display:inline-flex;align-items:center;gap:9px;padding:12px 18px;border-radius:8px;background:var(--blue);color:#fff;font-weight:650;font-size:14px;transition:.18s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 7px 18px rgba(0,103,197,.22)}
+.btn.secondary{background:#eef1f5;color:#1e2933}
+.profile-card{position:relative;background:linear-gradient(145deg,#f8fbff,#edf5fc);border:1px solid #dce9f5;border-radius:28px;padding:30px;box-shadow:var(--shadow)}
+.monogram{width:78px;height:78px;border-radius:18px;background:var(--dark);color:#fff;display:grid;place-items:center;font-size:27px;font-weight:700;margin-bottom:28px}
+.current{font-size:15px;color:var(--muted);margin-bottom:25px}.current strong{display:block;color:var(--ink);font-size:23px;margin-top:4px}
+.metrics{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #d8e4ef}
+.metric{padding:20px 12px 8px 0}.metric:nth-child(2n){padding-left:16px;border-left:1px solid #d8e4ef}.metric strong{display:block;font-size:31px;letter-spacing:-.04em}.metric span{font-size:12px;color:var(--muted)}
+section{padding:105px 0}
+.section-head{margin-bottom:48px}.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:750;color:var(--blue);margin-bottom:13px}
+h2{font-size:clamp(39px,5vw,64px);line-height:1;letter-spacing:-.055em;margin:0;max-width:780px}
+.about-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:75px}
+.about-lead{font-size:28px;line-height:1.25;letter-spacing:-.025em}
+.about-copy{font-size:17px;color:#4d5965;max-width:680px}
+.chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:27px}
+.chip{padding:8px 12px;border-radius:999px;background:#edf1f5;color:#34404c;font-size:13px}
+.timeline{position:relative}
+.timeline:before{content:"";position:absolute;left:9px;top:8px;bottom:8px;width:2px;background:#dce3ea}
+.job{position:relative;padding-left:48px;margin-bottom:65px}
+.dot{position:absolute;left:2px;top:8px;width:16px;height:16px;background:var(--blue);border:4px solid var(--bg);border-radius:50%;box-shadow:0 0 0 1px #cfd9e3}
+.job-top{display:flex;justify-content:space-between;gap:30px}
+.company{font-size:24px;font-weight:700;letter-spacing:-.025em}.role{font-size:16px;margin-top:2px}.meta,.date{font-size:13px;color:var(--muted)}.date{white-space:nowrap;text-align:right}
+.job ul{margin:19px 0 0;padding-left:20px;color:#4b5661}.job li{margin:8px 0;padding-left:4px}
+.highlight{margin-top:19px;padding:19px 21px;border:1px solid #cfe3f7;background:var(--blue2);border-radius:15px;color:#174d7b;font-size:14px}
+.ai-section{background:#111820;color:#fff}
+.ai-section .eyebrow{color:#75baff}.ai-section h2{color:#fff}.ai-intro{color:#c5cdd5;font-size:18px;max-width:720px;margin-top:18px}
+.ai-grid{display:grid;grid-template-columns:1.35fr .65fr;gap:18px;margin-top:45px}
+.ai-card{border:1px solid #303b46;background:#18222c;border-radius:22px;padding:28px;min-height:245px}
+.ai-card.big{background:linear-gradient(145deg,#172f45,#18222c);border-color:#2e5877}
+.ai-card h3{font-size:25px;letter-spacing:-.035em;margin:0 0 12px}.ai-card p{color:#bdc6ce;margin:0}
+.ai-tag{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:#72b8f7;font-weight:750;margin-bottom:45px}
+.ai-card.big .roi{font-size:42px;font-weight:700;letter-spacing:-.05em;margin-top:28px}.roi-label{font-size:12px;color:#9eabb7}
+.education{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.edu{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px;transition:.18s}.edu:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.edu h3{font-size:18px;margin:0 0 7px}.edu p{margin:0;color:var(--muted);font-size:14px}
+.contact{margin:25px 0 70px;background:#fff;border:1px solid var(--line);border-radius:28px;padding:65px;box-shadow:var(--shadow)}
+.contact-grid{display:grid;grid-template-columns:1fr auto;gap:50px;align-items:end}.contact h2{margin-bottom:17px}.contact p{color:var(--muted);font-size:17px;max-width:650px}.contact-links{display:flex;gap:9px;flex-wrap:wrap}.contact-links a{padding:10px 14px;border:1px solid var(--line);border-radius:8px;font-size:13px;background:#fafbfc}.contact-links a:hover{border-color:#a9cbea;color:var(--blue)}
+footer{padding:0 0 35px;color:#7a8590;font-size:12px}
+@media(max-width:820px){
+ .container{width:min(100% - 34px,680px)}.nav{height:62px}.navlinks{display:none}
+ .hero-inner{grid-template-columns:1fr;gap:45px;padding:75px 0 80px;min-height:auto}
+ .about-grid,.ai-grid,.contact-grid{grid-template-columns:1fr;gap:30px}
+ section{padding:75px 0}.job-top{display:block}.date{text-align:left;margin-top:6px}
+ .education{grid-template-columns:1fr}.contact{padding:40px 26px;margin-left:0;margin-right:0;border-radius:20px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+ <div class="container nav-inner">
+  <a class="brand" href="#top">Sandeep Kumar P <small>Product Owner</small></a>
+  <div class="navlinks">
+   <a href="#about">About</a><a href="#experience">Experience</a><a href="#ai">AI Work</a><a href="#education">Education</a><a href="#contact">Contact</a>
+  </div>
+ </div>
+</nav>
+
+<header class="hero" id="top">
+ <div class="container hero-inner">
+  <div>
+   <div class="kicker">Product • AI • Delivery</div>
+   <h1>Turning complex problems into products.</h1>
+   <p class="lead">Techno-functional Product Owner with 13+ years of experience driving end-to-end product delivery in Agile environments and translating business problems into scalable AI-driven solutions.</p>
+   <div class="actions">
+    <a class="btn" href="#experience">View experience →</a>
+    <a class="btn secondary" href="mailto:sandeepreddy27ba@gmail.com">Contact me</a>
+   </div>
+  </div>
+  <aside class="profile-card">
+   <div class="monogram">SK</div>
+   <div class="current">CURRENT ROLE<strong>Product Owner · Evernorth Health Services</strong></div>
+   <div class="metrics">
+    <div class="metric"><strong>13+</strong><span>YEARS EXPERIENCE</span></div>
+    <div class="metric"><strong>95%+</strong><span>STORY ACCEPTANCE</span></div>
+    <div class="metric"><strong>90%+</strong><span>SPRINT VELOCITY</span></div>
+    <div class="metric"><strong>$1.84M</strong><span>AI POC ROI</span></div>
+   </div>
+  </aside>
+ </div>
+</header>
+
+<main>
+<section id="about">
+ <div class="container">
+  <div class="section-head"><div class="eyebrow">01 / About</div><h2>Product thinking backed by execution.</h2></div>
+  <div class="about-grid">
+   <div class="about-lead">I connect business, engineering, architecture, UX, legal and compliance to turn ambitious ideas into shippable products.</div>
+   <div class="about-copy">
+    <p>Proven ability to own product backlogs, translate complex business problems into scalable AI-driven solutions, and lead cross-functional teams. Experienced across Agile, Scrum and SAFe environments with a strong focus on measurable outcomes, product health and continuous improvement.</p>
+    <div class="chips">
+     <span class="chip">Agentic Mode</span><span class="chip">A/B Testing</span><span class="chip">AI Productivity</span><span class="chip">AI for Data Analysis</span><span class="chip">Generative AI Leader</span><span class="chip">AWS Cloud Practitioner</span><span class="chip">Advanced Tableau</span>
+    </div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section id="experience">
+ <div class="container">
+  <div class="section-head"><div class="eyebrow">02 / Experience</div><h2>A career built around outcomes.</h2></div>
+  <div class="timeline">
+
+   <article class="job"><span class="dot"></span>
+    <div class="job-top"><div><div class="company">Evernorth Health Services</div><div class="role">Product Owner</div><div class="meta">Hyderabad</div></div><div class="date">June 2026 — Present</div></div>
+   </article>
+
+   <article class="job"><span class="dot"></span>
+    <div class="job-top"><div><div class="company">Cyient</div><div class="role">Product Owner</div><div class="meta">Hyderabad</div></div><div class="date">December 2020 — February 2026</div></div>
+    <ul>
+     <li>Owned product vision, quarterly roadmap and backlog for an Urban Mobility Backoffice ecosystem spanning Customer Service, B2B Fulfilment, Pricing, Payments and Open Partner APIs, connected through ESB orchestration and security.</li>
+     <li>Bridged business stakeholders, Solution Architects and engineering teams; converted complex business vision into MVPs, story maps and user stories with a 95%+ acceptance rate across 150+ stories.</li>
+     <li>Facilitated SAFe/Scrum ceremonies across 3 cross-functional squads, maintaining sprint velocity above 90% and reducing sprint carry-over by ~35%.</li>
+     <li>Authored functional and non-functional requirements, API change specifications and testing scenarios for engineering and QA.</li>
+     <li>Used AI-driven insights and predictive analytics for feature prioritization, tracking OKRs, burndown, defect leakage and post-launch KPIs.</li>
+     <li>Cultivated relationships across 6+ stakeholder groups and reduced revision cycles by ~40% through structured sprint demos, executive readouts and data-driven prioritization.</li>
+     <li>Translated PII, HITL and GDPR/CCPA requirements into acceptance criteria, achieving zero post-launch compliance escalations across 4 major releases.</li>
+    </ul>
+    <div class="highlight"><strong>AI POCs:</strong> Autonomous Transit Refund System using 6-agent LangGraph, RAG and NeMo Guardrails — stated ROI of $1.84M — plus an AI Promotions & Personalization Engine.</div>
+   </article>
+
+   <article class="job"><span class="dot"></span>
+    <div class="job-top"><div><div class="company">People Tech Group Inc</div><div class="role">Sr Business Analyst — Scrum Master</div><div class="meta">Hyderabad, Telangana, India</div></div><div class="date">July 2020 — December 2020</div></div>
+    <ul>
+     <li>Managed product backlog and sprint execution for 4 concurrent products, aligning delivery with business priorities.</li>
+     <li>Led cross-functional Agile teams of 15 developers and 8 QA through sprint planning, refinement and release cycles.</li>
+     <li>Translated business requirements into user stories, workflows and UI requirements and facilitated stand-ups, reviews and retrospectives.</li>
+     <li>Built stakeholder reporting dashboards and acted as primary liaison between business and engineering.</li>
+    </ul>
+   </article>
+
+   <article class="job"><span class="dot"></span>
+    <div class="job-top"><div><div class="company">Cadmach</div><div class="role">Business Analysis and Implementation Consultant</div><div class="meta">Hyderabad, Telangana, India</div></div><div class="date">May 2018 — August 2019</div></div>
+    <ul>
+     <li>Business Analyst and Project Management Consultant in a Scrum environment, supporting software development and replacement cycles for tablet compression.</li>
+     <li>Managed backlog prioritization, sequencing and delegation; headed Scrum ceremonies and stakeholder reviews.</li>
+     <li>Used time-series, cluster, box-plot and predictive analysis on tablet weights and product maintenance data, saving costs by 35%.</li>
+     <li>Engaged project, delivery, quality and external stakeholders to ensure timely delivery and future-ready, cost-effective solutions.</li>
+    </ul>
+   </article>
+
+   <article class="job"><span class="dot"></span>
+    <div class="job-top"><div><div class="company">Vega Automation</div><div class="role">Business Analyst — Sales</div><div class="meta">Hyderabad, Telangana, India</div></div><div class="date">April 2015 — October 2017</div></div>
+    <ul>
+     <li>Gathered requirements, supported pre-sales solutioning, pricing and iterative project updates; bridged Sales and Project Management.</li>
+     <li>Led project kick-offs across project management, finance, quality, delivery and service teams and managed effective project handover.</li>
+     <li>Performed gap analysis, monitored execution, managed engineering changes in internal design and SAP software, and supported client acceptance.</li>
+     <li>Hired, trained and mentored trainees while strengthening self-organising agile teams and cross-functional knowledge sharing.</li>
+    </ul>
+   </article>
+
+   <article class="job"><span class="dot"></span>
+    <div class="job-top"><div><div class="company">FMC Technologies</div><div class="role">Quality and Reliability Analyst</div><div class="meta">Hyderabad, Telangana, India</div></div><div class="date">February 2013 — April 2015</div></div>
+    <ul>
+     <li>Led FMC India Quality and Reliability teams as functional support for FMC USA and FMC Singapore.</li>
+     <li>Performed FMECA and RPN-based risk analysis on major components for every project.</li>
+     <li>Managed project status, quality checks, SAP Quality module updates and product signoffs.</li>
+     <li>Developed product strategies that reduced project costs by 35%.</li>
+    </ul>
+   </article>
+  </div>
+ </div>
+</section>
+
+<section class="ai-section" id="ai">
+ <div class="container">
+  <div class="section-head"><div class="eyebrow">03 / AI Work</div><h2>Where product meets AI.</h2><p class="ai-intro">A product-led approach to agentic systems, personalization and data-driven decision making.</p></div>
+  <div class="ai-grid">
+   <article class="ai-card big">
+    <div class="ai-tag">Featured POC</div>
+    <h3>Autonomous Transit Refund System</h3>
+    <p>Greenfield AI platform using a 6-agent LangGraph architecture, RAG and NeMo Guardrails.</p>
+    <div class="roi">$1.84M</div><div class="roi-label">STATED ROI</div>
+   </article>
+   <article class="ai-card">
+    <div class="ai-tag">AI Platform</div>
+    <h3>AI Promotions & Personalization Engine</h3>
+    <p>Greenfield AI platform focused on intelligent promotions and personalized experiences.</p>
+   </article>
+   <article class="ai-card">
+    <div class="ai-tag">Product Analytics</div>
+    <h3>Data-driven prioritization</h3>
+    <p>AI-driven insights and predictive analytics applied to product health, KPIs, OKRs, defect leakage and post-launch outcomes.</p>
+   </article>
+  </div>
+ </div>
+</section>
+
+<section id="education">
+ <div class="container">
+  <div class="section-head"><div class="eyebrow">04 / Education</div><h2>Continuous learning.</h2></div>
+  <div class="education">
+   <article class="edu"><h3>Indian School of Business</h3><p>Product Management with AI, Product Management · April 2026 — July 2026</p></article>
+   <article class="edu"><h3>Birla Institute of Technology and Science, Pilani</h3><p>Bachelor of Engineering (BE), Mechanical Engineering · 2008 — 2012</p></article>
+   <article class="edu"><h3>Narayana Junior College — India</h3><p>Maths, Physics, Chemistry · 2006 — 2008</p></article>
+   <article class="edu"><h3>Sri Sathya Sai Higher Secondary School</h3><p>1996 — 2006</p></article>
+  </div>
+ </div>
+</section>
+
+<div class="container">
+ <section class="contact" id="contact">
+  <div class="contact-grid">
+   <div>
+    <div class="eyebrow">05 / Contact</div>
+    <h2>Let's build something useful.</h2>
+    <p>Interested in product strategy, AI-driven products, Agile delivery or simply exchanging ideas? Reach out.</p>
+   </div>
+   <div class="contact-links">
+    <a href="mailto:sandeepreddy27ba@gmail.com">Email</a>
+    <a href="https://www.linkedin.com/in/sandeep-kumar-p-0a088a1a8" target="_blank" rel="noopener">LinkedIn</a>
+    <a href="https://www.notion.so/Optimizing-Transit-Retention-via-Data-Driven-Incentives-044ed4fa9d314922b5fe52c5b51962b0" target="_blank" rel="noopener">Portfolio</a>
+   </div>
+  </div>
+ </section>
+ <footer>© 2026 Sandeep Kumar P · Product Owner · Greater Hyderabad Area</footer>
+</div>
+</main>
+</body>
+</html>
