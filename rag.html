@@ -1,0 +1,1848 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAG Simulator — Learn Retrieval Augmented Generation</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    :root {
+        --bg: #07111f;
+        --panel: #0d1a2b;
+        --panel2: #111f32;
+        --border: #24364e;
+        --text: #e8f0fb;
+        --muted: #8fa4bd;
+        --blue: #5aa9ff;
+        --cyan: #54e6ff;
+        --green: #48d597;
+        --yellow: #ffd166;
+        --red: #ff6b7a;
+        --purple: #a78bfa;
+    }
+
+    body {
+        margin: 0;
+        background:
+            radial-gradient(circle at 15% 0%, rgba(84,230,255,.10), transparent 30%),
+            radial-gradient(circle at 90% 10%, rgba(167,139,250,.10), transparent 30%),
+            var(--bg);
+        color: var(--text);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        min-height: 100vh;
+    }
+
+    button, textarea, input, select {
+        font: inherit;
+    }
+
+    .app {
+        max-width: 1500px;
+        margin: auto;
+        padding: 28px;
+    }
+
+    header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 28px;
+    }
+
+    .eyebrow {
+        color: var(--cyan);
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 2px;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+
+    h1 {
+        font-size: clamp(30px, 4vw, 52px);
+        line-height: 1;
+        margin: 0 0 12px;
+        letter-spacing: -2px;
+    }
+
+    .subtitle {
+        max-width: 760px;
+        color: var(--muted);
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    .controls {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    button {
+        border: 1px solid var(--border);
+        background: var(--panel);
+        color: var(--text);
+        padding: 11px 16px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    button:hover {
+        transform: translateY(-1px);
+        border-color: var(--blue);
+    }
+
+    .primary {
+        background: linear-gradient(135deg, #2684ff, #6a5cff);
+        border: none;
+        font-weight: 700;
+    }
+
+    .danger {
+        color: #ff9aa5;
+    }
+
+    .pipeline {
+        display: grid;
+        grid-template-columns: repeat(11, minmax(100px, 1fr));
+        gap: 7px;
+        margin-bottom: 28px;
+        overflow-x: auto;
+        padding-bottom: 5px;
+    }
+
+    .pipe {
+        min-width: 105px;
+        padding: 13px 8px;
+        background: rgba(13,26,43,.8);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        text-align: center;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .pipe.active {
+        border-color: var(--cyan);
+        box-shadow: 0 0 20px rgba(84,230,255,.12);
+    }
+
+    .pipe.done {
+        border-color: rgba(72,213,151,.55);
+    }
+
+    .pipe-num {
+        width: 25px;
+        height: 25px;
+        display: grid;
+        place-items: center;
+        margin: auto auto 7px;
+        border-radius: 50%;
+        background: #17283e;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .pipe.done .pipe-num {
+        background: rgba(72,213,151,.15);
+        color: var(--green);
+    }
+
+    .pipe.active .pipe-num {
+        background: rgba(84,230,255,.15);
+        color: var(--cyan);
+    }
+
+    .pipe-label {
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .workspace {
+        display: grid;
+        grid-template-columns: 330px 1fr 330px;
+        gap: 18px;
+    }
+
+    .panel {
+        background: rgba(13,26,43,.82);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+        min-width: 0;
+    }
+
+    .panel-head {
+        padding: 16px 18px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .panel-title {
+        font-weight: 800;
+        font-size: 14px;
+    }
+
+    .panel-body {
+        padding: 18px;
+    }
+
+    .query-box {
+        background: #081422;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 13px;
+        margin-bottom: 15px;
+    }
+
+    textarea {
+        width: 100%;
+        min-height: 110px;
+        resize: vertical;
+        border: none;
+        outline: none;
+        background: transparent;
+        color: var(--text);
+        line-height: 1.5;
+    }
+
+    .kb-card {
+        padding: 14px;
+        background: #0a1727;
+        border: 1px solid var(--border);
+        border-radius: 11px;
+        margin-bottom: 10px;
+    }
+
+    .kb-card h4 {
+        margin: 0 0 6px;
+        font-size: 13px;
+    }
+
+    .kb-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .tag {
+        display: inline-flex;
+        padding: 4px 7px;
+        border-radius: 5px;
+        background: rgba(90,169,255,.1);
+        color: #9ccaff;
+        font-size: 10px;
+        margin: 7px 4px 0 0;
+    }
+
+    .center {
+        min-height: 650px;
+    }
+
+    .stage {
+        display: none;
+        animation: fade .25s ease;
+    }
+
+    .stage.active {
+        display: block;
+    }
+
+    @keyframes fade {
+        from { opacity: 0; transform: translateY(5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .stage-intro {
+        padding: 20px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .stage-number {
+        color: var(--cyan);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .stage h2 {
+        margin: 7px 0;
+        font-size: 25px;
+    }
+
+    .stage-description {
+        color: var(--muted);
+        line-height: 1.55;
+        margin: 0;
+    }
+
+    .content {
+        padding: 20px;
+    }
+
+    .flow-box {
+        background: #081422;
+        border: 1px solid var(--border);
+        border-radius: 13px;
+        padding: 17px;
+        margin-bottom: 14px;
+    }
+
+    .flow-box h3 {
+        font-size: 13px;
+        margin: 0 0 10px;
+    }
+
+    .arrow {
+        text-align: center;
+        color: var(--cyan);
+        padding: 5px;
+        font-size: 22px;
+    }
+
+    .chunk {
+        background: #0a1727;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 14px;
+        margin-bottom: 10px;
+    }
+
+    .chunk-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+
+    .chunk-id {
+        color: var(--cyan);
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .score {
+        color: var(--green);
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .chunk-text {
+        font-size: 12px;
+        line-height: 1.55;
+        color: #bdcce0;
+    }
+
+    .vector {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 10px;
+    }
+
+    .dimension {
+        background: #15263a;
+        padding: 6px 8px;
+        border-radius: 5px;
+        font-family: monospace;
+        color: #a8c8e9;
+        font-size: 10px;
+    }
+
+    .bar {
+        height: 7px;
+        background: #16273b;
+        border-radius: 20px;
+        overflow: hidden;
+        margin-top: 10px;
+    }
+
+    .bar > span {
+        display: block;
+        height: 100%;
+        width: 0;
+        background: linear-gradient(90deg, var(--blue), var(--cyan));
+        border-radius: inherit;
+        transition: width 1s ease;
+    }
+
+    .prompt {
+        white-space: pre-wrap;
+        background: #050d16;
+        border: 1px solid #1c3149;
+        padding: 17px;
+        border-radius: 12px;
+        color: #b9d7f6;
+        font-family: "SFMono-Regular", Consolas, monospace;
+        font-size: 11px;
+        line-height: 1.65;
+        max-height: 420px;
+        overflow: auto;
+    }
+
+    .answer {
+        padding: 18px;
+        border-radius: 13px;
+        background: linear-gradient(135deg, rgba(72,213,151,.08), rgba(84,230,255,.04));
+        border: 1px solid rgba(72,213,151,.3);
+        line-height: 1.7;
+    }
+
+    .answer h3 {
+        margin-top: 0;
+    }
+
+    .citation {
+        color: var(--cyan);
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .metric {
+        background: #0a1727;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 13px;
+    }
+
+    .metric-label {
+        color: var(--muted);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: .7px;
+    }
+
+    .metric-value {
+        font-size: 21px;
+        font-weight: 800;
+        margin-top: 5px;
+    }
+
+    .legend {
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.6;
+    }
+
+    .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        color: var(--green);
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .dot {
+        width: 7px;
+        height: 7px;
+        background: var(--green);
+        border-radius: 50%;
+    }
+
+    .log {
+        max-height: 220px;
+        overflow: auto;
+    }
+
+    .log-item {
+        padding: 9px 0;
+        border-bottom: 1px solid rgba(255,255,255,.05);
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    .log-item b {
+        color: var(--text);
+    }
+
+    .tip {
+        padding: 13px;
+        border-left: 3px solid var(--purple);
+        background: rgba(167,139,250,.06);
+        border-radius: 0 9px 9px 0;
+        color: #c6b9ee;
+        font-size: 11px;
+        line-height: 1.6;
+        margin-top: 15px;
+    }
+
+    .footer-note {
+        margin-top: 22px;
+        text-align: center;
+        color: #61758c;
+        font-size: 11px;
+    }
+
+    @media(max-width: 1100px) {
+        .workspace {
+            grid-template-columns: 1fr;
+        }
+
+        .pipeline {
+            grid-template-columns: repeat(11, 110px);
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+    <div>
+        <div class="eyebrow">Interactive AI Learning Lab</div>
+        <h1>RAG Simulator</h1>
+        <p class="subtitle">
+            Watch a Retrieval-Augmented Generation system transform documents into embeddings,
+            retrieve relevant knowledge, build an augmented prompt and produce a grounded answer.
+        </p>
+    </div>
+
+    <div class="controls">
+        <button onclick="resetSimulator()">Reset</button>
+        <button class="primary" onclick="runFullRAG()">▶ Run Full RAG</button>
+    </div>
+</header>
+
+
+<!-- PIPELINE -->
+<div class="pipeline" id="pipeline">
+
+    <div class="pipe active" data-step="1" onclick="showStep(1)">
+        <div class="pipe-num">1</div>
+        <div class="pipe-label">Knowledge Base</div>
+    </div>
+
+    <div class="pipe" data-step="2" onclick="showStep(2)">
+        <div class="pipe-num">2</div>
+        <div class="pipe-label">Chunking</div>
+    </div>
+
+    <div class="pipe" data-step="3" onclick="showStep(3)">
+        <div class="pipe-num">3</div>
+        <div class="pipe-label">Embeddings</div>
+    </div>
+
+    <div class="pipe" data-step="4" onclick="showStep(4)">
+        <div class="pipe-num">4</div>
+        <div class="pipe-label">Vector DB</div>
+    </div>
+
+    <div class="pipe" data-step="5" onclick="showStep(5)">
+        <div class="pipe-num">5</div>
+        <div class="pipe-label">User Query</div>
+    </div>
+
+    <div class="pipe" data-step="6" onclick="showStep(6)">
+        <div class="pipe-num">6</div>
+        <div class="pipe-label">Query Embedding</div>
+    </div>
+
+    <div class="pipe" data-step="7" onclick="showStep(7)">
+        <div class="pipe-num">7</div>
+        <div class="pipe-label">Retrieval</div>
+    </div>
+
+    <div class="pipe" data-step="8" onclick="showStep(8)">
+        <div class="pipe-num">8</div>
+        <div class="pipe-label">Reranking</div>
+    </div>
+
+    <div class="pipe" data-step="9" onclick="showStep(9)">
+        <div class="pipe-num">9</div>
+        <div class="pipe-label">Augmented Prompt</div>
+    </div>
+
+    <div class="pipe" data-step="10" onclick="showStep(10)">
+        <div class="pipe-num">10</div>
+        <div class="pipe-label">LLM</div>
+    </div>
+
+    <div class="pipe" data-step="11" onclick="showStep(11)">
+        <div class="pipe-num">11</div>
+        <div class="pipe-label">Answer</div>
+    </div>
+
+</div>
+
+
+<div class="workspace">
+
+<!-- LEFT PANEL -->
+<aside class="panel">
+
+    <div class="panel-head">
+        <div class="panel-title">Knowledge Base</div>
+        <span class="status"><span class="dot"></span> Indexed</span>
+    </div>
+
+    <div class="panel-body">
+
+        <div class="kb-card">
+            <h4>Company Handbook</h4>
+            <p>
+                A guide containing information about company policies,
+                working hours, leave, remote work and benefits.
+            </p>
+            <span class="tag">PDF</span>
+            <span class="tag">HR</span>
+        </div>
+
+        <div class="kb-card">
+            <h4>Remote Work Policy</h4>
+            <p>
+                Employees may work remotely up to three days per week.
+                Remote work must be coordinated with the manager.
+            </p>
+            <span class="tag">Policy</span>
+        </div>
+
+        <div class="kb-card">
+            <h4>Leave Policy</h4>
+            <p>
+                Full-time employees receive 24 paid leave days annually.
+                Unused leave can be carried forward according to policy.
+            </p>
+            <span class="tag">HR</span>
+        </div>
+
+        <div class="kb-card">
+            <h4>Working Hours</h4>
+            <p>
+                Standard working hours are 9:00 AM to 6:00 PM,
+                Monday through Friday.
+            </p>
+            <span class="tag">Operations</span>
+        </div>
+
+        <div class="kb-card">
+            <h4>Benefits Guide</h4>
+            <p>
+                Employees receive health insurance, retirement benefits
+                and learning allowances subject to eligibility.
+            </p>
+            <span class="tag">Benefits</span>
+        </div>
+
+    </div>
+</aside>
+
+
+<!-- CENTER -->
+<main class="panel center">
+
+<!-- STEP 1 -->
+<section class="stage active" id="stage-1">
+    <div class="stage-intro">
+        <div class="stage-number">Step 01</div>
+        <h2>Collect the Knowledge Base</h2>
+        <p class="stage-description">
+            RAG begins with the information the system should be able to answer questions about.
+        </p>
+    </div>
+
+    <div class="content">
+        <div class="flow-box">
+            <h3>Raw knowledge</h3>
+            <p class="legend">
+                Documents can come from PDFs, websites, databases, Word files,
+                internal wikis, support tickets, APIs, images, diagrams, etc.
+            </p>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="flow-box">
+            <h3>Important distinction</h3>
+            <p class="legend">
+                The LLM itself is not being retrained here.
+                We are giving the LLM external knowledge at inference time.
+            </p>
+        </div>
+
+        <div class="tip">
+            <b>Think of it as:</b> "Don't teach the LLM permanently.
+            Give it the relevant pages when the user asks a question."
+        </div>
+    </div>
+</section>
+
+
+<!-- STEP 2 -->
+<section class="stage" id="stage-2">
+    <div class="stage-intro">
+        <div class="stage-number">Step 02</div>
+        <h2>Chunk the Documents</h2>
+        <p class="stage-description">
+            Large documents are split into smaller pieces that can be independently retrieved.
+        </p>
+    </div>
+
+    <div class="content" id="chunks"></div>
+</section>
+
+
+<!-- STEP 3 -->
+<section class="stage" id="stage-3">
+    <div class="stage-intro">
+        <div class="stage-number">Step 03</div>
+        <h2>Generate Embeddings</h2>
+        <p class="stage-description">
+            Each chunk is transformed into a numerical representation of its semantic meaning.
+        </p>
+    </div>
+
+    <div class="content" id="embeddings"></div>
+</section>
+
+
+<!-- STEP 4 -->
+<section class="stage" id="stage-4">
+    <div class="stage-intro">
+        <div class="stage-number">Step 04</div>
+        <h2>Store in the Vector Database</h2>
+        <p class="stage-description">
+            The embedding, original text and metadata are stored together.
+        </p>
+    </div>
+
+    <div class="content">
+        <div class="metric-grid">
+            <div class="metric">
+                <div class="metric-label">Vectors</div>
+                <div class="metric-value">12</div>
+            </div>
+
+            <div class="metric">
+                <div class="metric-label">Dimensions</div>
+                <div class="metric-value">384</div>
+            </div>
+
+            <div class="metric">
+                <div class="metric-label">Index</div>
+                <div class="metric-value">HNSW</div>
+            </div>
+
+            <div class="metric">
+                <div class="metric-label">Metadata</div>
+                <div class="metric-value">5 fields</div>
+            </div>
+        </div>
+
+        <div class="flow-box" style="margin-top:15px">
+            <h3>What is actually stored?</h3>
+            <div class="prompt">{
+  "id": "chunk_07",
+  "text": "Employees may work remotely...",
+  "embedding": [0.18, -0.42, 0.77, ...],
+  "metadata": {
+      "source": "remote_work_policy.pdf",
+      "page": 3,
+      "department": "HR"
+  }
+}</div>
+        </div>
+
+        <div class="tip">
+            A vector database normally stores much more than the vector itself.
+            The original chunk and metadata are critical for retrieving usable context.
+        </div>
+    </div>
+</section>
+
+
+<!-- STEP 5 -->
+<section class="stage" id="stage-5">
+    <div class="stage-intro">
+        <div class="stage-number">Step 05</div>
+        <h2>User Query</h2>
+        <p class="stage-description">
+            The user asks a question. In production systems, query rewriting may happen before retrieval.
+        </p>
+    </div>
+
+    <div class="content">
+        <div class="query-box">
+            <textarea id="query">How many days of paid leave do employees get?</textarea>
+        </div>
+
+        <button class="primary" onclick="updateQuery()">Use This Query</button>
+
+        <div class="tip">
+            The original user query doesn't go directly to the vector database.
+            It is first converted into a representation that can be compared with document embeddings.
+        </div>
+    </div>
+</section>
+
+
+<!-- STEP 6 -->
+<section class="stage" id="stage-6">
+    <div class="stage-intro">
+        <div class="stage-number">Step 06</div>
+        <h2>Embed the Query</h2>
+        <p class="stage-description">
+            The query is converted into an embedding using the same compatible embedding model.
+        </p>
+    </div>
+
+    <div class="content">
+        <div class="flow-box">
+            <h3>User query</h3>
+            <p id="queryDisplay" class="legend"></p>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="flow-box">
+            <h3>Query embedding</h3>
+            <div class="vector" id="queryVector"></div>
+        </div>
+
+        <div class="tip">
+            <b>Important:</b> the document embeddings and query embedding need to live
+            in a compatible embedding space. Usually this means using the same embedding model.
+        </div>
+    </div>
+</section>
+
+
+<!-- STEP 7 -->
+<section class="stage" id="stage-7">
+    <div class="stage-intro">
+        <div class="stage-number">Step 07</div>
+        <h2>Retrieve Relevant Chunks</h2>
+        <p class="stage-description">
+            The system compares the query with stored vectors and retrieves the most relevant candidates.
+        </p>
+    </div>
+
+    <div class="content">
+        <div class="metric-grid">
+            <div class="metric">
+                <div class="metric-label">Search type</div>
+                <div class="metric-value">Vector</div>
+            </div>
+
+            <div class="metric">
+                <div class="metric-label">Top K</div>
+                <div class="metric-value">5</div>
+            </div>
+        </div>
+
+        <div id="retrievalResults" style="margin-top:15px"></div>
+
+        <div class="tip">
+            <b>Nearest neighbour ≠ guaranteed correct answer.</b>
+            Vector similarity is a relevance signal, not proof that a chunk contains the answer.
+        </div>
+    </div>
+</section>
+
+
+<!-- STEP 8 -->
+<section class="stage" id="stage-8">
+    <div class="stage-intro">
+        <div class="stage-number">Step 08</div>
+        <h2>Reranking</h2>
+        <p class="stage-description">
+            A reranker can inspect retrieved candidates more deeply and reorder them before sending them to the LLM.
+        </p>
+    </div>
+
+    <div class="content">
+
+        <div class="flow-box">
+            <h3>Why rerank?</h3>
+            <p class="legend">
+                Vector search is optimized for fast candidate retrieval.
+                A reranker can perform a more expensive relevance calculation
+                on a smaller set of candidates.
+            </p>
+        </div>
+
+        <div id="reranked"></div>
+
+        <div class="tip">
+            A common production architecture is:
+            <b>retrieve Top-20 → rerank → send Top-5 to the LLM.</b>
+        </div>
+
+    </div>
+</section>
+
+
+<!-- STEP 9 -->
+<section class="stage" id="stage-9">
+    <div class="stage-intro">
+        <div class="stage-number">Step 09</div>
+        <h2>Augment the Prompt</h2>
+        <p class="stage-description">
+            The retrieved context is inserted into a prompt alongside the user's question and instructions.
+        </p>
+    </div>
+
+    <div class="content">
+        <div class="prompt" id="augmentedPrompt"></div>
+
+        <div class="tip">
+            This is the key RAG trick:
+            <b>retrieve first, then generate.</b>
+        </div>
+    </div>
+</section>
+
+
+<!-- STEP 10 -->
+<section class="stage" id="stage-10">
+    <div class="stage-intro">
+        <div class="stage-number">Step 10</div>
+        <h2>LLM Generation</h2>
+        <p class="stage-description">
+            The LLM receives the augmented prompt and generates a response.
+        </p>
+    </div>
+
+    <div class="content">
+
+        <div class="flow-box">
+            <h3>What the LLM sees</h3>
+
+            <div class="metric-grid">
+                <div class="metric">
+                    <div class="metric-label">User Question</div>
+                    <div class="metric-value">1</div>
+                </div>
+
+                <div class="metric">
+                    <div class="metric-label">Retrieved Chunks</div>
+                    <div class="metric-value">3</div>
+                </div>
+
+                <div class="metric">
+                    <div class="metric-label">Instructions</div>
+                    <div class="metric-value">1</div>
+                </div>
+
+                <div class="metric">
+                    <div class="metric-label">Generation</div>
+                    <div class="metric-value">ON</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="flow-box">
+            <h3>Important nuance</h3>
+            <p class="legend">
+                The LLM is <b>not technically restricted</b> to the retrieved chunks.
+                It still contains its pretrained knowledge.
+                The prompt instructs it to ground its answer in the supplied context.
+            </p>
+        </div>
+
+    </div>
+</section>
+
+
+<!-- STEP 11 -->
+<section class="stage" id="stage-11">
+    <div class="stage-intro">
+        <div class="stage-number">Step 11</div>
+        <h2>Grounded Answer</h2>
+        <p class="stage-description">
+            The final answer should be supported by the retrieved evidence.
+        </p>
+    </div>
+
+    <div class="content">
+
+        <div class="answer">
+            <h3>Answer</h3>
+
+            <p>
+                Full-time employees receive <b>24 paid leave days annually</b>.
+                Unused leave may be carried forward according to the applicable policy.
+            </p>
+
+            <div class="citation">
+                [Source: Leave Policy → Chunk 04]
+            </div>
+        </div>
+
+        <div class="metric-grid" style="margin-top:15px">
+            <div class="metric">
+                <div class="metric-label">Grounding</div>
+                <div class="metric-value" style="color:var(--green)">96%</div>
+            </div>
+
+            <div class="metric">
+                <div class="metric-label">Retrieved Context</div>
+                <div class="metric-value">3</div>
+            </div>
+        </div>
+
+        <div class="tip">
+            <b>RAG's goal:</b> improve factuality by giving the model
+            relevant external evidence at answer-generation time.
+        </div>
+
+    </div>
+</section>
+
+</main>
+
+
+<!-- RIGHT PANEL -->
+<aside class="panel">
+
+    <div class="panel-head">
+        <div class="panel-title">RAG Monitor</div>
+    </div>
+
+    <div class="panel-body">
+
+        <div class="metric">
+            <div class="metric-label">Current Stage</div>
+            <div class="metric-value" id="currentStage">1 / 11</div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div class="metric">
+            <div class="metric-label">Retrieved Chunks</div>
+            <div class="metric-value" id="retrievedCount">0</div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div class="metric">
+            <div class="metric-label">Context Tokens</div>
+            <div class="metric-value" id="contextTokens">0</div>
+        </div>
+
+        <div style="height:20px"></div>
+
+        <h3 style="font-size:12px">Pipeline Log</h3>
+
+        <div class="log" id="log"></div>
+
+        <div class="tip">
+            <b>Learning goal:</b><br>
+            Follow the data as it moves through the system.
+            Documents become vectors → queries become vectors →
+            vectors retrieve evidence → evidence becomes context →
+            context guides generation.
+        </div>
+
+    </div>
+</aside>
+
+</div>
+
+<div class="footer-note">
+    Educational simulation — embeddings, vector search and LLM generation are represented
+    conceptually using deterministic browser-side logic.
+</div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   RAG SIMULATOR DATA
+   ========================================================= */
+
+const chunks = [
+    {
+        id: "chunk_01",
+        source: "Company Handbook",
+        text: "The company handbook describes general employee policies, workplace expectations and benefits.",
+        topic: "general"
+    },
+    {
+        id: "chunk_02",
+        source: "Remote Work Policy",
+        text: "Employees may work remotely up to three days per week. Remote work must be coordinated with the employee's manager.",
+        topic: "remote"
+    },
+    {
+        id: "chunk_03",
+        source: "Working Hours",
+        text: "Standard working hours are 9:00 AM to 6:00 PM, Monday through Friday.",
+        topic: "hours"
+    },
+    {
+        id: "chunk_04",
+        source: "Leave Policy",
+        text: "Full-time employees receive 24 paid leave days annually. Unused leave can be carried forward according to the applicable policy.",
+        topic: "leave"
+    },
+    {
+        id: "chunk_05",
+        source: "Benefits Guide",
+        text: "Employees receive health insurance, retirement benefits and learning allowances subject to eligibility requirements.",
+        topic: "benefits"
+    }
+];
+
+
+/* =========================================================
+   STATE
+   ========================================================= */
+
+let currentStep = 1;
+
+let state = {
+    query: "How many days of paid leave do employees get?",
+    retrieved: [],
+    reranked: []
+};
+
+
+/* =========================================================
+   UTILITY FUNCTIONS
+   ========================================================= */
+
+function escapeHTML(str) {
+    return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+}
+
+
+/*
+    This is NOT a real embedding model.
+
+    We create deterministic pseudo-vectors in the browser
+    so the user can visually understand what embeddings look like.
+*/
+function pseudoEmbedding(text) {
+
+    let values = [];
+
+    for(let i = 0; i < 8; i++) {
+
+        let hash = 0;
+
+        for(let j = 0; j < text.length; j++) {
+            hash = ((hash << 5) - hash) + text.charCodeAt(j) + i * 17;
+            hash |= 0;
+        }
+
+        let value = Math.sin(hash * 0.0001) * 0.8;
+
+        values.push(Number(value.toFixed(3)));
+    }
+
+    return values;
+}
+
+
+function cosineSimilarity(a,b) {
+
+    let dot = 0;
+    let magA = 0;
+    let magB = 0;
+
+    for(let i=0; i<a.length; i++) {
+        dot += a[i] * b[i];
+        magA += a[i] * a[i];
+        magB += b[i] * b[i];
+    }
+
+    return dot / (Math.sqrt(magA) * Math.sqrt(magB));
+}
+
+
+/*
+    For the educational simulator we additionally use
+    keyword relevance so the example produces intuitive
+    retrieval results.
+*/
+function relevance(query, chunk) {
+
+    const q = query.toLowerCase();
+
+    let score = 0;
+
+    const words = q
+        .replace(/[?.,]/g,"")
+        .split(/\s+/);
+
+    words.forEach(word => {
+
+        if(word.length < 3) return;
+
+        if(chunk.text.toLowerCase().includes(word)) {
+            score += 0.12;
+        }
+    });
+
+    if(
+        q.includes("leave") ||
+        q.includes("paid") ||
+        q.includes("days")
+    ) {
+
+        if(chunk.topic === "leave") {
+            score += 0.75;
+        }
+    }
+
+    if(q.includes("remote") && chunk.topic === "remote") {
+        score += 0.75;
+    }
+
+    if(
+        (q.includes("hours") || q.includes("working")) &&
+        chunk.topic === "hours"
+    ) {
+        score += 0.75;
+    }
+
+    if(q.includes("benefits") && chunk.topic === "benefits") {
+        score += 0.75;
+    }
+
+    return Math.min(score, 0.99);
+}
+
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+function showStep(step) {
+
+    currentStep = step;
+
+    document.querySelectorAll(".stage").forEach(stage => {
+        stage.classList.remove("active");
+    });
+
+    document
+        .getElementById("stage-" + step)
+        .classList.add("active");
+
+    document.querySelectorAll(".pipe").forEach(pipe => {
+
+        pipe.classList.remove("active");
+
+        if(Number(pipe.dataset.step) < step) {
+            pipe.classList.add("done");
+        }
+
+        if(Number(pipe.dataset.step) === step) {
+            pipe.classList.add("active");
+        }
+    });
+
+    document.getElementById("currentStage").textContent =
+        step + " / 11";
+
+    renderStep(step);
+}
+
+
+/* =========================================================
+   RENDER STEPS
+   ========================================================= */
+
+function renderStep(step) {
+
+    if(step === 2) renderChunks();
+
+    if(step === 3) renderEmbeddings();
+
+    if(step === 6) renderQueryEmbedding();
+
+    if(step === 7) performRetrieval();
+
+    if(step === 8) renderReranking();
+
+    if(step === 9) renderPrompt();
+
+    addLog("Viewed stage " + step);
+}
+
+
+function renderChunks() {
+
+    const container = document.getElementById("chunks");
+
+    container.innerHTML = `
+        <div class="flow-box">
+            <h3>Chunking strategy</h3>
+            <p class="legend">
+                Real systems can use fixed-size chunks, recursive chunking,
+                semantic chunking, heading-aware chunking, parent-child chunks,
+                or document-specific strategies.
+            </p>
+        </div>
+    `;
+
+    chunks.forEach((chunk, index) => {
+
+        container.innerHTML += `
+            <div class="chunk">
+                <div class="chunk-top">
+                    <span class="chunk-id">${chunk.id}</span>
+                    <span class="tag">${chunk.source}</span>
+                </div>
+
+                <div class="chunk-text">
+                    ${escapeHTML(chunk.text)}
+                </div>
+
+                <div>
+                    <span class="tag">topic: ${chunk.topic}</span>
+                    <span class="tag">~${chunk.text.split(" ").length} tokens</span>
+                </div>
+            </div>
+        `;
+    });
+}
+
+
+function renderEmbeddings() {
+
+    const container = document.getElementById("embeddings");
+
+    container.innerHTML = `
+        <div class="flow-box">
+            <h3>Embedding model</h3>
+            <p class="legend">
+                Imagine that an embedding API converts each chunk into a
+                high-dimensional vector. Real models may produce hundreds
+                or thousands of dimensions. We show only 8 here.
+            </p>
+        </div>
+    `;
+
+    chunks.forEach(chunk => {
+
+        const vector = pseudoEmbedding(chunk.text);
+
+        container.innerHTML += `
+            <div class="chunk">
+                <div class="chunk-top">
+                    <span class="chunk-id">${chunk.id}</span>
+                    <span class="score">Vector generated</span>
+                </div>
+
+                <div class="vector">
+                    ${vector.map(v =>
+                        `<span class="dimension">${v}</span>`
+                    ).join("")}
+                </div>
+
+                <div class="bar">
+                    <span style="width:${Math.min(100, Math.abs(vector[0])*100)}%"></span>
+                </div>
+            </div>
+        `;
+    });
+}
+
+
+function renderQueryEmbedding() {
+
+    const vector = pseudoEmbedding(state.query);
+
+    document.getElementById("queryDisplay").textContent =
+        state.query;
+
+    document.getElementById("queryVector").innerHTML =
+        vector.map(v =>
+            `<span class="dimension">${v}</span>`
+        ).join("");
+}
+
+
+function performRetrieval() {
+
+    const results = chunks
+        .map(chunk => {
+
+            const vector = pseudoEmbedding(chunk.text);
+            const queryVector = pseudoEmbedding(state.query);
+
+            const semantic = cosineSimilarity(
+                queryVector,
+                vector
+            );
+
+            const keyword = relevance(
+                state.query,
+                chunk
+            );
+
+            /*
+                Hybrid score:
+                vector similarity + lexical relevance.
+            */
+            const score =
+                Math.max(
+                    0,
+                    Math.min(
+                        0.99,
+                        semantic * 0.35 + keyword * 0.65
+                    )
+                );
+
+            return {
+                ...chunk,
+                score
+            };
+        })
+        .sort((a,b) => b.score - a.score);
+
+    state.retrieved = results.slice(0,5);
+
+    const container =
+        document.getElementById("retrievalResults");
+
+    container.innerHTML = `
+        <div class="flow-box">
+            <h3>Vector / hybrid retrieval results</h3>
+            <p class="legend">
+                Candidates are ranked by relevance. In this simulator,
+                we combine semantic similarity with simple lexical matching
+                to demonstrate the idea of hybrid retrieval.
+            </p>
+        </div>
+    `;
+
+    state.retrieved.forEach((chunk, index) => {
+
+        container.innerHTML += `
+            <div class="chunk">
+                <div class="chunk-top">
+                    <span class="chunk-id">
+                        #${index + 1} ${chunk.id}
+                    </span>
+
+                    <span class="score">
+                        similarity ${(chunk.score * 100).toFixed(1)}%
+                    </span>
+                </div>
+
+                <div class="chunk-text">
+                    ${escapeHTML(chunk.text)}
+                </div>
+
+                <div class="bar">
+                    <span style="width:${chunk.score*100}%"></span>
+                </div>
+            </div>
+        `;
+    });
+
+    document.getElementById("retrievedCount").textContent =
+        state.retrieved.length;
+
+    document.getElementById("contextTokens").textContent =
+        state.retrieved
+            .slice(0,3)
+            .reduce((sum,c) => sum + c.text.split(" ").length, 0);
+
+    addLog(
+        "Retrieved " +
+        state.retrieved.length +
+        " candidate chunks"
+    );
+}
+
+
+function renderReranking() {
+
+    if(!state.retrieved.length) {
+        performRetrieval();
+    }
+
+    /*
+        Simulate a reranker.
+
+        In real systems this could be a cross-encoder,
+        LLM reranker or another relevance model.
+    */
+
+    state.reranked = [...state.retrieved]
+        .map(chunk => {
+
+            let score = chunk.score;
+
+            if(chunk.topic === "leave") {
+                score += 0.15;
+            }
+
+            return {
+                ...chunk,
+                rerankScore: Math.min(score, .99)
+            };
+        })
+        .sort((a,b) =>
+            b.rerankScore - a.rerankScore
+        );
+
+    const container =
+        document.getElementById("reranked");
+
+    container.innerHTML = `
+        <div class="flow-box">
+            <h3>Reranker output</h3>
+            <p class="legend">
+                The retriever finds candidates quickly.
+                The reranker performs deeper relevance evaluation
+                before final context selection.
+            </p>
+        </div>
+    `;
+
+    state.reranked.forEach((chunk,index) => {
+
+        const selected = index < 3;
+
+        container.innerHTML += `
+            <div class="chunk"
+                 style="${selected ?
+                    "border-color:rgba(72,213,151,.4)" :
+                    "opacity:.55"}">
+
+                <div class="chunk-top">
+
+                    <span class="chunk-id">
+                        ${selected ? "✓ FINAL " : "○ "}
+                        ${chunk.id}
+                    </span>
+
+                    <span class="score">
+                        ${(chunk.rerankScore*100).toFixed(1)}%
+                    </span>
+
+                </div>
+
+                <div class="chunk-text">
+                    ${escapeHTML(chunk.text)}
+                </div>
+            </div>
+        `;
+    });
+
+    addLog("Reranked candidates; selected top 3");
+}
+
+
+function renderPrompt() {
+
+    if(!state.reranked.length) {
+        renderReranking();
+    }
+
+    const context = state.reranked
+        .slice(0,3)
+        .map((chunk,index) =>
+            `[CONTEXT ${index+1}]
+Source: ${chunk.source}
+Chunk ID: ${chunk.id}
+
+${chunk.text}`
+        )
+        .join("\n\n");
+
+    const prompt = `
+SYSTEM INSTRUCTIONS
+-------------------
+You are a helpful assistant.
+
+Answer the user's question using the supplied context.
+
+Rules:
+1. Prefer information contained in the context.
+2. Do not invent facts.
+3. If the answer cannot be found in the context,
+   say that the information is not available.
+4. Where possible, identify the source.
+
+RETRIEVED CONTEXT
+-----------------
+${context}
+
+USER QUESTION
+-------------
+${state.query}
+
+TASK
+----
+Generate a concise, grounded answer.
+`;
+
+    document.getElementById("augmentedPrompt").textContent =
+        prompt.trim();
+
+    addLog("Constructed augmented prompt");
+}
+
+
+/* =========================================================
+   QUERY
+   ========================================================= */
+
+function updateQuery() {
+
+    const value =
+        document.getElementById("query").value.trim();
+
+    if(!value) return;
+
+    state.query = value;
+
+    document.getElementById("queryDisplay").textContent =
+        value;
+
+    state.retrieved = [];
+    state.reranked = [];
+
+    addLog("User query updated");
+
+    showStep(6);
+}
+
+
+/* =========================================================
+   FULL RAG RUN
+   ========================================================= */
+
+async function runFullRAG() {
+
+    resetSimulator(false);
+
+    const sequence = [
+        1,2,3,4,5,6,7,8,9,10,11
+    ];
+
+    for(const step of sequence) {
+
+        showStep(step);
+
+        await new Promise(resolve =>
+            setTimeout(resolve, 750)
+        );
+    }
+
+    addLog("✓ Full RAG pipeline completed");
+}
+
+
+/* =========================================================
+   FINAL ANSWER
+   ========================================================= */
+
+function generateAnswer() {
+
+    const q = state.query.toLowerCase();
+
+    let answer = "";
+
+    if(
+        q.includes("leave") ||
+        q.includes("paid") ||
+        q.includes("days")
+    ) {
+
+        answer = `
+            <h3>Grounded Answer</h3>
+
+            <p>
+                Full-time employees receive
+                <b>24 paid leave days annually</b>.
+                Unused leave may be carried forward according
+                to the applicable policy.
+            </p>
+
+            <div class="citation">
+                [Source: Leave Policy → chunk_04]
+            </div>
+        `;
+
+    } else if(q.includes("remote")) {
+
+        answer = `
+            <h3>Grounded Answer</h3>
+
+            <p>
+                Employees may work remotely up to
+                <b>three days per week</b>, with coordination
+                with their manager.
+            </p>
+
+            <div class="citation">
+                [Source: Remote Work Policy → chunk_02]
+            </div>
+        `;
+
+    } else if(
+        q.includes("hours") ||
+        q.includes("working")
+    ) {
+
+        answer = `
+            <h3>Grounded Answer</h3>
+
+            <p>
+                Standard working hours are
+                <b>9:00 AM to 6:00 PM, Monday through Friday</b>.
+            </p>
+
+            <div class="citation">
+                [Source: Working Hours → chunk_03]
+            </div>
+        `;
+
+    } else {
+
+        answer = `
+            <h3>Grounded Answer</h3>
+
+            <p>
+                The retrieved context does not contain enough
+                information to confidently answer this question.
+            </p>
+
+            <div class="citation">
+                [Grounding policy: abstain when evidence is insufficient]
+            </div>
+        `;
+    }
+
+    document.querySelector("#stage-11 .content .answer").innerHTML =
+        answer;
+}
+
+
+/* =========================================================
+   LOGGING
+   ========================================================= */
+
+function addLog(message) {
+
+    const log =
+        document.getElementById("log");
+
+    const time =
+        new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit"
+        });
+
+    const item =
+        document.createElement("div");
+
+    item.className = "log-item";
+
+    item.innerHTML =
+        `<b>${time}</b> — ${escapeHTML(message)}`;
+
+    log.prepend(item);
+}
+
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+function resetSimulator(clearLog = true) {
+
+    currentStep = 1;
+
+    state.query =
+        document.getElementById("query")?.value ||
+        "How many days of paid leave do employees get?";
+
+    state.retrieved = [];
+    state.reranked = [];
+
+    document.querySelectorAll(".pipe").forEach(pipe => {
+        pipe.classList.remove("done");
+        pipe.classList.remove("active");
+
+        if(Number(pipe.dataset.step) === 1) {
+            pipe.classList.add("active");
+        }
+    });
+
+    document.querySelectorAll(".stage").forEach(stage => {
+        stage.classList.remove("active");
+    });
+
+    document.getElementById("stage-1").classList.add("active");
+
+    document.getElementById("currentStage").textContent =
+        "1 / 11";
+
+    document.getElementById("retrievedCount").textContent =
+        "0";
+
+    document.getElementById("contextTokens").textContent =
+        "0";
+
+    if(clearLog) {
+        document.getElementById("log").innerHTML = "";
+    }
+
+    addLog("Simulator initialized");
+
+    renderChunks();
+    renderEmbeddings();
+}
+
+
+/* =========================================================
+   INITIALIZE
+   ========================================================= */
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    document.getElementById("queryDisplay").textContent =
+        state.query;
+
+    addLog("Knowledge base loaded");
+
+    addLog("Vector index ready");
+
+    renderChunks();
+    renderEmbeddings();
+
+});
+
+</script>
+
+</body>
+</html>
+```
